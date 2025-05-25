@@ -335,13 +335,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         
     def do_POST(self):
+        global last_main_data, last_gh1_data, last_gh2_data, main_boiler_state, gh1_button_state, gh2_button_state
         try:
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length).decode('utf-8')
             params = json.loads(post_data)
             
             if self.path == '/setpressureconfig':
-                global last_main_data
                 # Log the received request
                 print("\nReceived POST request to /setpressureconfig")
                 print("Request data:", json.dumps(params, indent=2))
@@ -368,7 +368,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                     last_main_data = new_main
             
             elif self.path == '/setmainconfig':
-                global last_main_data
                 # Log the received request
                 print("\nReceived POST request to /setmainconfig")
                 print("Request data:", json.dumps(params, indent=2))
@@ -395,7 +394,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                     last_main_data = new_main
             
             elif self.path == '/saveghconfig':
-                global last_gh1_data, last_gh2_data
                 print("\nReceived POST request to /saveghconfig")
                 print("Request data:", json.dumps(params, indent=2))
                 new_config = params.get('config', {})
@@ -474,7 +472,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                 print("--------------------------------\n")
 
             elif self.path == '/setstatusupdate':
-                global main_boiler_state, gh1_button_state, gh2_button_state, last_main_data
                 print("\nReceived POST request to /setstatusupdate")
                 print("Request data:", json.dumps(params, indent=2))
                 target = params.get('target')
