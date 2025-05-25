@@ -341,6 +341,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             params = json.loads(post_data)
             
             if self.path == '/setpressureconfig':
+                global last_main_data
                 # Log the received request
                 print("\nReceived POST request to /setpressureconfig")
                 print("Request data:", json.dumps(params, indent=2))
@@ -361,13 +362,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                 print(json.dumps(config.pressureConfig, indent=2))
                 print("--------------------------------\n")
                 
-                global last_main_data
                 new_main = [main_boiler_state, gh1_button_state, gh2_button_state, int(round(config.pressureConfig['pressure'])), int(round(config.mainAmpereConfig['temperature']))]
                 if last_main_data != new_main:
                     send_main_uart()
                     last_main_data = new_main
             
             elif self.path == '/setmainconfig':
+                global last_main_data
                 # Log the received request
                 print("\nReceived POST request to /setmainconfig")
                 print("Request data:", json.dumps(params, indent=2))
@@ -388,13 +389,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                 }, indent=2))
                 print("--------------------------------\n")
                 
-                global last_main_data
                 new_main = [main_boiler_state, gh1_button_state, gh2_button_state, int(round(config.pressureConfig['pressure'])), int(round(config.mainAmpereConfig['temperature']))]
                 if last_main_data != new_main:
                     send_main_uart()
                     last_main_data = new_main
             
             elif self.path == '/saveghconfig':
+                global last_gh1_data, last_gh2_data
                 print("\nReceived POST request to /saveghconfig")
                 print("Request data:", json.dumps(params, indent=2))
                 new_config = params.get('config', {})
@@ -409,7 +410,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                         "purge": int(new_config.get('purge', config.gh1_config['purge'])),
                         "backflush": bool(new_config.get('backflush', config.gh1_config['backflush']))
                     })
-                    global last_gh1_data
                     new_gh1 = [
                         int(round(config.gh1_config['temperature'])),
                         int(round(config.gh1_config['extraction_volume'])),
@@ -432,7 +432,6 @@ class RequestHandler(BaseHTTPRequestHandler):
                         "purge": int(new_config.get('purge', config.gh2_config['purge'])),
                         "backflush": bool(new_config.get('backflush', config.gh2_config['backflush']))
                     })
-                    global last_gh2_data
                     new_gh2 = [
                         int(round(config.gh2_config['temperature'])),
                         int(round(config.gh2_config['extraction_volume'])),
@@ -475,11 +474,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 print("--------------------------------\n")
 
             elif self.path == '/setstatusupdate':
+                global main_boiler_state, gh1_button_state, gh2_button_state, last_main_data
                 print("\nReceived POST request to /setstatusupdate")
                 print("Request data:", json.dumps(params, indent=2))
                 target = params.get('target')
                 status = params.get('status')
-                global main_boiler_state, gh1_button_state, gh2_button_state, last_main_data
                 state_changed = False
                 if target == 'main_boiler':
                     new_state = 1 if status else 0
