@@ -98,14 +98,6 @@ class UARTCommunicator:
         """Continuously write data to UART"""
         while self.running:
             try:
-                # Prepare data to send
-                data_to_send = {
-                    "type": "status",
-                    "data": self.current_data
-                }
-                out_str = json.dumps(data_to_send) + '\n'
-                self.ser.write(out_str.encode())
-                print(f"UART OUT (loop): {out_str.strip()}")
                 time.sleep(0.1)  # Small delay between writes
             except Exception as e:
                 print(f"Error writing to UART: {e}")
@@ -156,17 +148,8 @@ class UARTCommunicator:
         """Update configuration data"""
         if config_type in self.config_data:
             self.config_data[config_type].update(config_data)
-            # Send updated config to UART
-            try:
-                data_to_send = {
-                    "type": "config_update",
-                    "data": {config_type: config_data}
-                }
-                out_str = json.dumps(data_to_send) + '\n'
-                self.ser.write(out_str.encode())
-                print(f"UART OUT (config): {out_str.strip()}")
-            except Exception as e:
-                print(f"Error sending config update: {e}")
+            # No automatic UART send here
+            pass
 
     # Add a public method to send arbitrary strings and print them
     def send_string(self, s: str):
